@@ -40,7 +40,7 @@ const verifyConversion = async (req, res) => {
                 return res.status(400).json({ status, attemptsLeft: 3 - attempts });
             } else {
                 status = "Unsuccessful Conversion after 3 attempts";
-                pointsRecieved = Math.floor((team?.pointsRecieved || 50) / 2);
+                pointsRecieved = 25;
             }
         } else {
             let arry = getAnimeCharacter();

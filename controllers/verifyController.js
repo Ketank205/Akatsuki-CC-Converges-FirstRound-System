@@ -92,7 +92,7 @@ const verifyConversion = async (req, res) => {
     }
 };
 
-// export default verifyConversion;
+export default verifyConversion;
 // import Team from "../models/Team.js";
 // import { convertBinary, getUniqueNode, getAnimeCharacter } from "../utils/utility.js";
 

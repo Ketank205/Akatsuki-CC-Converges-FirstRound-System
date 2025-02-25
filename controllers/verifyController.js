@@ -72,7 +72,6 @@
 
 
 
-
 import Team from "../models/Team.js";
 import { convertBinary } from "../utils/utility.js";
 
@@ -80,7 +79,7 @@ const verifyController = async (req, res) => {
     try {
         const { teamName, binaryNumber, numberSystem, convertedValue } = req.body;
         const whichTeam = await Team.findOne({ teamName: teamName.toLowerCase() });
-        
+
         if (!whichTeam) {
             return res.status(404).json({ message: "Team not found." });
         }
@@ -90,10 +89,10 @@ const verifyController = async (req, res) => {
             return res.status(403).json({ message: "This team has already completed their attempts." });
         }
 
-        // Check if the binary number is already assigned to another team
+        // Check if the binary number is already assigned to a different team
         const existingBinaryNumber = await Team.findOne({ binaryNumber: binaryNumber });
         if (existingBinaryNumber && existingBinaryNumber.teamName !== teamName.toLowerCase()) {
-            return res.status(403).json({ message: "This binary number has already been assigned to another team." });
+            return res.status(403).json({ message: "This binary number has already been assigned to another team by bhavesh." });
         }
 
         let status = "Failed Conversion: Try Again!";
@@ -114,25 +113,28 @@ const verifyController = async (req, res) => {
             }
         }
 
+        // Update the team with the new attempt details
         await whichTeam.updateOne({
-            binaryNumber: binaryNumber,
-            numberSystem: numberSystem,
-            pointsRecieved: points,
-            attempts: whichTeam.attempts + 1
+            $set: {
+                binaryNumber: binaryNumber,
+                numberSystem: numberSystem,
+            },
+            $inc: { attempts: 1 },
+            $max: { pointsRecieved: points } // Ensure the highest points assigned persist
         });
-        
+
         let response = {
             status: status,
             teamName: teamName,
             pointsRecieved: points
         };
-        
+
         if (showCharacter) {
             response.assignedNode = whichTeam.assignedNode;
             response.assignedCharacter = whichTeam.animeCharacter.name;
             response.imageUrl = whichTeam.animeCharacter.imageUrl;
         }
-        
+
         res.status(200).json(response);
     }
     catch (error) {
@@ -142,4 +144,3 @@ const verifyController = async (req, res) => {
 }
 
 export default verifyController;
-

@@ -93,6 +93,7 @@
 // };
 
 // export default verifyConversion;
+
 import Team from "../models/Team.js";
 import { convertBinary } from "../utils/utility.js";
 
@@ -103,6 +104,17 @@ const verifyController = async (req, res) => {
         
         if (!whichTeam) {
             return res.status(404).json({ message: "Team not found." });
+        }
+
+        // Check if the team has already received points
+        if (whichTeam.pointsRecieved > 0) {
+            return res.status(403).json({ message: "This team has already completed their attempts." });
+        }
+
+        // Check if the binary number is already assigned to another team
+        const existingBinaryNumber = await Team.findOne({ binaryNumber: binaryNumber });
+        if (existingBinaryNumber && existingBinaryNumber.teamName !== teamName.toLowerCase()) {
+            return res.status(403).json({ message: "This binary number has already been assigned to another team." });
         }
 
         let status = "Failed Conversion: Try Again!";
